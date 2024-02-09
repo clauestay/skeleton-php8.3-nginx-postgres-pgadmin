@@ -1,0 +1,75 @@
+version: "3.9"
+
+# Network
+networks:
+  larared:
+    driver: bridge
+
+# Nginx Service
+services:
+  nginx:
+    # image: nginx:latest
+    build: ./nginx/
+    container_name: nginx-container
+    ports:
+      - "80:80"
+    volumes:
+        - ./laravel_code/:/var/www/html/
+    networks:
+      - larared
+
+# Php Service
+  php:
+    build: ./laravel_code/
+    # expose:
+    #   - 9000
+    ports:
+      #  - "9000:80"
+       - "5173:5173"
+    volumes:
+      - ./laravel_code/:/var/www/html/
+    networks:
+      - larared
+    depends_on: 
+      - nginx
+      - postgres
+    working_dir: /var/www/html/test_breeze
+
+# Postgres Service
+  postgres:
+    image: postgres
+    container_name: local_pgdb
+    restart: always
+    environment: 
+      - DATABASE_HOST=127.0.0.1
+      - POSTGRES_USER=root
+      - POSTGRES_PASSWORD=root
+      - POSTGRES_DB=root
+    ports: 
+      - 5430:5432
+    volumes:
+      - local_pgdata:/var/lib/postgresql/data
+    networks:
+      - larared
+
+# Pgadmin Service
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin4_container
+    restart: always
+    environment: 
+      PGADMIN_DEFAULT_EMAIL: "admin@admin.com"
+      PGADMIN_DEFAULT_PASSWORD: "admin"
+    ports:
+      - "5051:80"
+    volumes:
+      - pgadmin-data:/var/lib/pgadmin
+    networks:
+      - larared
+    depends_on: 
+      - postgres
+
+# volumes
+volumes:
+  local_pgdata:
+  pgadmin-data:

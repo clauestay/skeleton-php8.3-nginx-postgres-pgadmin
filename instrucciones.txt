@@ -1,0 +1,82 @@
+Estructura e indicaciones.
+- laravel_code
+    - oracle
+        - en esta carpeta se debe descomprimir el contenido de los 
+          zip basic y sdk de instant client version 11.2, formando una sola carpeta
+          llamada instantclient_11_2
+    - {codigo_app}
+        - aca debe ir el odigo fuente de la aplicación laravel.
+    - Dockerfile (Archivo con las instrucciones necesarias para instalar php, oracle v11.2 y oci8)
+    - index-example.php
+    - package-lock.json
+- nginx
+    - default.conf (Archivo con la configuración de Nginx. 
+      IMPORTANTE MODIFICAR VARIABLE root APUNTANDO A LA CARPETA PUBLIC DE SU APLICACIÓN ej: root /var/www/html/test_breeze/public;)
+    - Dockerfile (Archivo con las instrucciones necesarias para instalar Nginx)
+- docker-compose.yml (Archivo con las instrucciones de los servicios que levantara el contenedor)
+
+-------------------------------------------------------------------------------------------------------------------------------------
+
+Indicaciones para ejecutar el contenedor.
+- docker-compose build (para construir las imagenes)
+- docker-compose up -d (para ejecutar el contenedor  la bandera -d es para ejecutarlo en segundo plano)
+- configurar archivo .env en base a la configuracion del docker-compose.yml
+    # configuracion necesaria para conectarse a bd de postgres. (se usara para plugins de laravel)
+    DB_CONNECTION=pgsql
+    DB_HOST=postgres
+    DB_PORT=5432
+    DB_DATABASE=root
+    DB_USERNAME=root
+    DB_PASSWORD=root
+
+Indicaciones Codigo fuente.
+* Crear un proyecto nuevo
+- composer create-project laravel/laravel nombre_proyecto
+- cd nombre_proyecto
+- chmod -R 777 . (dar permisos al directorio del proyecto)
+- composer require laravel/breeze --dev (descarga las dependencias de laravel breeze)
+- php artisan breeze:install vue (instala vue e inertia)
+
+consideraciones:
+- agregar en archivo vite.config.js, antes de la linea: plugins: [
+server: {
+        hmr: {
+            host: 'localhost',
+        },
+    },
+
+- modificar en el archivo package.json
+"dev": "vite", por "dev": "vite --host",
+
+- ingresar al contenedor: docker exec -it nombre_contenedor bash
+- npm run dev
+- npm artisan migrate
+- abrir localhost en navegador.
+- si existe algun error, volver a dar permisos a la carpeta del proyecto como antes.
+
+* clonar proyecto
+- git clone url nombre_proyecto
+
+consideraciones:
+- agregar en archivo vite.config.js, antes de la linea: plugins: [
+server: {
+        hmr: {
+            host: 'localhost',
+        },
+    },
+
+- modificar en el archivo package.json
+"dev": "vite", por "dev": "vite --host",
+
+- ingresar al contenedor: docker exec -it nombre_contenedor bash
+- npm run dev
+- npm artisan migrate
+- chmod -R 777 . (dar permisos al directorio del proyecto)
+- abrir localhost en navegador.
+
+-------------------------------------------------------------------------------------------------
+Comandos Docker
+- ver contenedores: docker ps
+- ingresar contenedor: docker exec -it nombre_contenedor bash
+- levantar contenedor: docker-compose up (en la ruta donde exista un docker-compose.yml)
+- detener contenedor: docker-compose stop (en la ruta donde exista un docker-compose.yml)
